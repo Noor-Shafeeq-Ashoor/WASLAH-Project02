@@ -1,8 +1,10 @@
 package com.ga.waslah.controller;
 
 
+import com.ga.waslah.dto.RegisterRequest;
 import com.ga.waslah.model.User;
 import com.ga.waslah.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +20,10 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-
-        User newUser = userService.register(user);
+    public ResponseEntity<User> register(
+            @Valid @RequestBody RegisterRequest request
+    ) {
+        User newUser = userService.register(request);
 
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }

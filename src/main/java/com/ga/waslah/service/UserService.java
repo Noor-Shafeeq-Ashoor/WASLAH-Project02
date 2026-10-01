@@ -1,9 +1,11 @@
 package com.ga.waslah.service;
 
+import com.ga.waslah.dto.RegisterRequest;
 import com.ga.waslah.exception.ConflictException;
 import com.ga.waslah.model.Role;
 import com.ga.waslah.model.User;
 import com.ga.waslah.repository.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,17 +19,26 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User register(User user) {
+    public User register(RegisterRequest request) {
 
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new ConflictException("Username already exists");
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Username already exists");
         }
 
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new ConflictException("Email already exists");
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+
+        user.setPassword(
+                passwordEncoder.encode(request.getPassword())
+        );
+
+        // The user cannot choose their own role during registration
         user.setRole(Role.USER);
 
         return userRepository.save(user);

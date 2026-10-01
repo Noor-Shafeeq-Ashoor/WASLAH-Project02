@@ -1,13 +1,12 @@
-package com.ga.waslah.dto;
+package com.ga.waslah.exception;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class ErrorResponse {
 
     private LocalDateTime timestamp;
