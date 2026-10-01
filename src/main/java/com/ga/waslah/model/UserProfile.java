@@ -1,10 +1,8 @@
 package com.ga.waslah.model;
 
-
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,13 +17,23 @@ public class UserProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "First name is required")
+    @Column(nullable = false)
     private String firstName;
-    private String lastName;
-    private String phone;
-    private String bio;
-    private String location;
-    private String profileImage;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    @NotBlank(message = "Last name is required")
+    @Column(nullable = false)
+    private String lastName;
+
+    @Column
+    private String phone;
+
+    @Column(length = 500)
+    private String bio;
+
+    @Column
+    private String location;
+
+    @Column
+    private String profileImage;
 }
