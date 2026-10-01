@@ -31,7 +31,6 @@ public class UserProfileController {
         );
     }
 
-    @Valid
     @PutMapping
     public ResponseEntity<UserProfile> updateProfile(
             Authentication authentication,
