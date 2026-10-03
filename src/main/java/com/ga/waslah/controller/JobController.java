@@ -6,6 +6,7 @@ import com.ga.waslah.service.JobService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/jobs")
+
 public class JobController {
 
     private final JobService jobService;
@@ -22,6 +24,7 @@ public class JobController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('EMPLOYER')")
     public ResponseEntity<JobResponse> createJob(
             @Valid @RequestBody JobRequest request,
             Authentication authentication
@@ -55,6 +58,7 @@ public class JobController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('EMPLOYER')")
     public ResponseEntity<JobResponse> updateJob(
             @PathVariable Long id,
             @Valid @RequestBody JobRequest request,
@@ -71,6 +75,7 @@ public class JobController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('EMPLOYER')")
     public ResponseEntity<Void> deleteJob(
             @PathVariable Long id,
             Authentication authentication

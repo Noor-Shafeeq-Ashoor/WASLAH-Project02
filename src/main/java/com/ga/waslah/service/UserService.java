@@ -5,7 +5,7 @@ import com.ga.waslah.exception.ConflictException;
 import com.ga.waslah.model.Role;
 import com.ga.waslah.model.User;
 import com.ga.waslah.repository.UserRepository;
-import jakarta.validation.Valid;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +22,11 @@ public class UserService {
     public User register(RegisterRequest request) {
 
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new ConflictException("Username already exists");
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new ConflictException("Email already exists");
         }
 
         User user = new User();
