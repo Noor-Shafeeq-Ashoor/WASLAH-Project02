@@ -30,14 +30,42 @@ public class EmployerRequestService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
 
-        if (employerRequestRepository.findByUserUsername(username).isPresent()) {
-            throw new ConflictException("Employer request already exists");
+        // An existing employer does not need to submit a request.
+        if (user.getRole() == Role.EMPLOYER) {
+            throw new ConflictException(
+                    "You are already an employer"
+            );
+        }
+
+        var existingRequest =
+                employerRequestRepository.findByUserUsername(username);
+
+        if (existingRequest.isPresent()) {
+
+            EmployerRequest oldRequest = existingRequest.get();
+
+            if (oldRequest.getStatus() == EmployerRequestStatus.PENDING) {
+                throw new ConflictException(
+                        "You already have a pending employer request"
+                );
+            }
+
+            if (oldRequest.getStatus() == EmployerRequestStatus.APPROVED) {
+                throw new ConflictException(
+                        "Your employer request has already been approved"
+                );
+            }
+
+            // REJECTED → allow a new request.
+            employerRequestRepository.delete(oldRequest);
         }
 
         EmployerRequest employerRequest = new EmployerRequest();
 
         employerRequest.setCompanyName(request.getCompanyName());
-        employerRequest.setCompanyDescription(request.getCompanyDescription());
+        employerRequest.setCompanyDescription(
+                request.getCompanyDescription()
+        );
         employerRequest.setJobTypes(request.getJobTypes());
         employerRequest.setCommercialRegistration(
                 request.getCommercialRegistration()
@@ -109,8 +137,4 @@ public class EmployerRequestService {
 
         return employerRequestRepository.save(request);
     }
-
-
-
-
 }

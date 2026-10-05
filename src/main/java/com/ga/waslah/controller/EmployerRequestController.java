@@ -22,20 +22,13 @@ public class EmployerRequestController {
             EmployerRequest employerRequest
     ) {
 
-        EmployerRequestResponse response =
-                new EmployerRequestResponse();
-
-        response.setCompanyName(employerRequest.getCompanyName());
-        response.setCompanyDescription(
-                employerRequest.getCompanyDescription()
+        return new EmployerRequestResponse(
+                employerRequest.getCompanyName(),
+                employerRequest.getCompanyDescription(),
+                employerRequest.getJobTypes(),
+                employerRequest.getCommercialRegistration(),
+                employerRequest.getStatus()
         );
-        response.setJobTypes(employerRequest.getJobTypes());
-        response.setCommercialRegistration(
-                employerRequest.getCommercialRegistration()
-        );
-        response.setStatus(employerRequest.getStatus());
-
-        return response;
     }
 
     @PostMapping
@@ -66,7 +59,8 @@ public class EmployerRequestController {
                         authentication.getName()
                 );
 
-        return ResponseEntity.ok(toResponse(employerRequest));
-
+        return ResponseEntity.ok(
+                toResponse(employerRequest)
+        );
     }
 }
