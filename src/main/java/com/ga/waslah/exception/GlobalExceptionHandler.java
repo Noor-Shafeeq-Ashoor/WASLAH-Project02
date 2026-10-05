@@ -3,6 +3,9 @@ package com.ga.waslah.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,15 +20,12 @@ public class GlobalExceptionHandler {
             ResourceNotFoundException exception,
             HttpServletRequest request) {
 
-        ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
+        return buildError(
+                HttpStatus.NOT_FOUND,
                 "RESOURCE_NOT_FOUND",
                 exception.getMessage(),
-                request.getRequestURI()
+                request
         );
-
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BadRequestException.class)
@@ -33,54 +33,18 @@ public class GlobalExceptionHandler {
             BadRequestException exception,
             HttpServletRequest request) {
 
-        ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
+        return buildError(
+                HttpStatus.BAD_REQUEST,
                 "BAD_REQUEST",
                 exception.getMessage(),
-                request.getRequestURI()
+                request
         );
-
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<ErrorResponse> handleConflict(
-            ConflictException exception,
-            HttpServletRequest request) {
-
-        ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.CONFLICT.value(),
-                "CONFLICT",
-                exception.getMessage(),
-                request.getRequestURI()
-        );
-
-        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneralException(
-            Exception exception,
-            HttpServletRequest request) {
-
-        ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "INTERNAL_SERVER_ERROR",
-                "Something went wrong",
-                request.getRequestURI()
-        );
-
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
             MethodArgumentNotValidException exception,
-            HttpServletRequest request
-    ) {
+            HttpServletRequest request) {
 
         String message = exception.getBindingResult()
                 .getFieldErrors()
@@ -91,17 +55,84 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElse("Invalid request data");
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
+        return buildError(
+                HttpStatus.BAD_REQUEST,
                 "VALIDATION_ERROR",
+                message,
+                request
+        );
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(
+            ConflictException exception,
+            HttpServletRequest request) {
+
+        return buildError(
+                HttpStatus.CONFLICT,
+                "CONFLICT",
+                exception.getMessage(),
+                request
+        );
+    }
+
+    @ExceptionHandler({
+            AuthorizationDeniedException.class,
+            AccessDeniedException.class
+    })
+    public ResponseEntity<ErrorResponse> handleForbidden(
+            Exception exception,
+            HttpServletRequest request) {
+
+        return buildError(
+                HttpStatus.FORBIDDEN,
+                "FORBIDDEN",
+                "You do not have permission to access this resource",
+                request
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(
+            BadCredentialsException exception,
+            HttpServletRequest request) {
+
+        return buildError(
+                HttpStatus.UNAUTHORIZED,
+                "UNAUTHORIZED",
+                "Invalid username or password",
+                request
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneralException(
+            Exception exception,
+            HttpServletRequest request) {
+
+        return buildError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "INTERNAL_SERVER_ERROR",
+                "Something went wrong",
+                request
+        );
+    }
+
+    private ResponseEntity<ErrorResponse> buildError(
+            HttpStatus status,
+            String error,
+            String message,
+            HttpServletRequest request) {
+
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                status.value(),
+                error,
                 message,
                 request.getRequestURI()
         );
 
-        return new ResponseEntity<>(
-                errorResponse,
-                HttpStatus.BAD_REQUEST
-        );
+        return new ResponseEntity<>(response, status);
     }
 }
+
