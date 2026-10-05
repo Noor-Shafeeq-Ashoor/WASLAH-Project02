@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/jobs")
-
 public class JobController {
 
     private final JobService jobService;
@@ -23,6 +22,10 @@ public class JobController {
         this.jobService = jobService;
     }
 
+    // =========================
+    // CREATE
+    // =========================
+
     @PostMapping
     @PreAuthorize("hasRole('EMPLOYER')")
     public ResponseEntity<JobResponse> createJob(
@@ -30,14 +33,19 @@ public class JobController {
             Authentication authentication
     ) {
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(
-                        jobService.createJob(
-                                authentication.getName(),
-                                request
-                        )
-                );
+        JobResponse response = jobService.createJob(
+                authentication.getName(),
+                request
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
+
+    // =========================
+    // GET ALL
+    // =========================
 
     @GetMapping
     public ResponseEntity<List<JobResponse>> getAllJobs() {
@@ -46,6 +54,10 @@ public class JobController {
                 jobService.getAllJobs()
         );
     }
+
+    // =========================
+    // GET BY ID
+    // =========================
 
     @GetMapping("/{id}")
     public ResponseEntity<JobResponse> getJobById(
@@ -56,6 +68,10 @@ public class JobController {
                 jobService.getJobById(id)
         );
     }
+
+    // =========================
+    // UPDATE
+    // =========================
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('EMPLOYER')")
@@ -73,6 +89,10 @@ public class JobController {
                 )
         );
     }
+
+    // =========================
+    // CLOSE
+    // =========================
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('EMPLOYER')")

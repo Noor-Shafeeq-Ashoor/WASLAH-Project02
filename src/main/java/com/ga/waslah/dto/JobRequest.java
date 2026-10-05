@@ -12,17 +12,31 @@ import java.time.LocalDateTime;
 public class JobRequest {
 
     @NotBlank(message = "Title is required")
-    @Size(max = 150, message = "Title must not exceed 150 characters")
+    @Size(
+            max = 150,
+            message = "Title must not exceed 150 characters"
+    )
     private String title;
 
     @NotBlank(message = "Description is required")
-    @Size(max = 2000, message = "Description must not exceed 2000 characters")
+    @Size(
+            max = 2000,
+            message = "Description must not exceed 2000 characters"
+    )
     private String description;
 
     @NotBlank(message = "Company name is required")
+    @Size(
+            max = 150,
+            message = "Company name must not exceed 150 characters"
+    )
     private String companyName;
 
     @NotBlank(message = "Location is required")
+    @Size(
+            max = 150,
+            message = "Location must not exceed 150 characters"
+    )
     private String location;
 
     @NotNull(message = "Job type is required")
