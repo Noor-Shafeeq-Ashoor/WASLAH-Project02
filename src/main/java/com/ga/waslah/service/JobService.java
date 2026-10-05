@@ -2,9 +2,11 @@ package com.ga.waslah.service;
 
 import com.ga.waslah.dto.JobRequest;
 import com.ga.waslah.dto.JobResponse;
+import com.ga.waslah.exception.ForbiddenException;
 import com.ga.waslah.exception.ResourceNotFoundException;
 import com.ga.waslah.model.Job;
 import com.ga.waslah.model.JobStatus;
+import com.ga.waslah.model.Role;
 import com.ga.waslah.model.User;
 import com.ga.waslah.repository.JobRepository;
 import com.ga.waslah.repository.UserRepository;
@@ -26,11 +28,21 @@ public class JobService {
         this.userRepository = userRepository;
     }
 
-    public JobResponse createJob(String username, JobRequest request) {
+    public JobResponse createJob(
+            String username,
+            JobRequest request
+    ) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
+
+        // Only approved employers can create jobs.
+        if (user.getRole() != Role.EMPLOYER) {
+            throw new ForbiddenException(
+                    "Only employers can create jobs"
+            );
+        }
 
         Job job = new Job();
 
@@ -76,7 +88,9 @@ public class JobService {
                         new ResourceNotFoundException("Job not found"));
 
         if (!job.getCreatedBy().getUsername().equals(username)) {
-            throw new RuntimeException("You are not allowed to update this job");
+            throw new ForbiddenException(
+                    "You are not allowed to update this job"
+            );
         }
 
         job.setTitle(request.getTitle());
@@ -90,14 +104,19 @@ public class JobService {
         return toResponse(jobRepository.save(job));
     }
 
-    public void deleteJob(Long id, String username) {
+    public void deleteJob(
+            Long id,
+            String username
+    ) {
 
         Job job = jobRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Job not found"));
 
         if (!job.getCreatedBy().getUsername().equals(username)) {
-            throw new RuntimeException("You are not allowed to delete this job");
+            throw new ForbiddenException(
+                    "You are not allowed to delete this job"
+            );
         }
 
         job.setStatus(JobStatus.CLOSED);
