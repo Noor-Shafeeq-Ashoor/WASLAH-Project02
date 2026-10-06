@@ -45,4 +45,14 @@ public class User {
     @ToString.Exclude
     private List<Cafe> managedCafes;
 
+    // A user can submit one or more cafe registration requests.
+    @OneToMany(
+            mappedBy = "requestedBy",
+            cascade = CascadeType.ALL
+    )
+    @ToString.Exclude
+    private List<CafeRegistrationRequest> cafeRegistrationRequests;
+
+
+
 }
