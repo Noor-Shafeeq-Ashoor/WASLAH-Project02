@@ -30,6 +30,12 @@ public class Cafe {
     @Column(nullable = false)
     private Boolean active = true;
 
+    // Each cafe is managed by one Cafe Manager.
+    @ManyToOne
+    @JoinColumn(name = "manager_id", nullable = false)
+    @ToString.Exclude
+    private User manager;
+
     @OneToMany(
             mappedBy = "cafe",
             cascade = CascadeType.ALL,

@@ -7,6 +7,8 @@ import jakarta.persistence.Table;
 import lombok.*;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,5 +39,10 @@ public class User {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")
     private UserProfile userProfile;
+
+    // A Cafe Manager can manage one or more cafes.
+    @OneToMany(mappedBy = "manager")
+    @ToString.Exclude
+    private List<Cafe> managedCafes;
 
 }
