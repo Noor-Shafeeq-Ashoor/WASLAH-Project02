@@ -40,6 +40,9 @@ public class User {
     @Column(nullable = false)
     private UserStatus status;
 
+    @Column(nullable = false)
+    private boolean emailVerified = false;
+
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")

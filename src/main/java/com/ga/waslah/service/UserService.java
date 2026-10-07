@@ -18,14 +18,18 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
+
 
     public UserService(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder, EmailVerificationService emailVerificationService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailVerificationService = emailVerificationService;
     }
+
 
     public User register(RegisterRequest request) {
 
@@ -52,8 +56,19 @@ public class UserService {
         // New users are active by default.
         user.setStatus(UserStatus.ACTIVE);
 
-        return userRepository.save(user);
+        // New users must verify their email.
+        user.setEmailVerified(false);
+
+        User savedUser = userRepository.save(user);
+
+        // Generate verification token and send mock email.
+        emailVerificationService.createAndSendVerificationToken(
+                savedUser
+        );
+
+        return savedUser;
     }
+
 
     public void deactivateUser(Long userId) {
 
