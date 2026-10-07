@@ -1,9 +1,6 @@
 package com.ga.waslah.config;
 
-import com.ga.waslah.model.Cafe;
-import com.ga.waslah.model.Role;
-import com.ga.waslah.model.StudySpace;
-import com.ga.waslah.model.User;
+import com.ga.waslah.model.*;
 import com.ga.waslah.repository.CafeRepository;
 import com.ga.waslah.repository.StudySpaceRepository;
 import com.ga.waslah.repository.UserRepository;
@@ -50,6 +47,7 @@ public class DataLoader implements CommandLineRunner {
                             passwordEncoder.encode("Cafe@12345")
                     );
                     newManager.setRole(Role.CAFE_MANAGER);
+                    newManager.setStatus(UserStatus.ACTIVE);
 
                     return userRepository.save(newManager);
                 });
