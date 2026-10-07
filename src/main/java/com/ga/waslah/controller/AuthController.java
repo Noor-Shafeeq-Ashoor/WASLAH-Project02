@@ -6,15 +6,17 @@ import com.ga.waslah.exception.BadRequestException;
 import com.ga.waslah.exception.ForbiddenException;
 import com.ga.waslah.exception.ResourceNotFoundException;
 import com.ga.waslah.model.User;
+import com.ga.waslah.model.UserStatus;
 import com.ga.waslah.repository.UserRepository;
 import com.ga.waslah.security.JwtService;
 import com.ga.waslah.service.EmailVerificationService;
+import com.ga.waslah.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.security.authentication.BadCredentialsException;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -24,6 +26,8 @@ public class AuthController {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final EmailVerificationService emailVerificationService;
+    private final UserService userService;
+
 
     @PostMapping("/login")
     public LoginResponse login(
@@ -38,13 +42,19 @@ public class AuthController {
                 )
         );
 
-        if (user.getStatus() !=
-                com.ga.waslah.model.UserStatus.ACTIVE) {
+        // =========================
+        // ACCOUNT STATUS
+        // =========================
 
+        if (user.getStatus() == UserStatus.INACTIVE) {
             throw new ForbiddenException(
                     "Your account is inactive and cannot be used"
             );
         }
+
+        // =========================
+        // EMAIL VERIFICATION
+        // =========================
 
         if (!user.isEmailVerified()) {
             throw new ForbiddenException(
@@ -52,21 +62,56 @@ public class AuthController {
             );
         }
 
-        Authentication authentication =
-                authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                loginRequest.getUsername(),
-                                loginRequest.getPassword()
-                        )
+        // =========================
+        // TEMPORARY LOGIN LOCK
+        // =========================
+
+        if (userService.isLoginLocked(user)) {
+            throw new ForbiddenException(
+                    "Too many failed login attempts. Please try again later."
+            );
+        }
+
+        // =========================
+        // AUTHENTICATION
+        // =========================
+
+        try {
+
+            Authentication authentication =
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    loginRequest.getUsername(),
+                                    loginRequest.getPassword()
+                            )
+                    );
+
+            // Password is correct.
+            userService.resetLoginAttempts(user);
+
+            String token = jwtService.generateToken(
+                    authentication.getName()
+            );
+
+            return new LoginResponse(token);
+
+        } catch (BadCredentialsException exception) {
+
+            // Password is incorrect.
+            userService.recordFailedLogin(user);
+
+            // User reached 3 failed attempts.
+            if (user.getFailedLoginAttempts() >= 3) {
+                throw new ForbiddenException(
+                        "Too many failed login attempts. Your account is locked for 1 minute."
                 );
+            }
 
-        String token = jwtService.generateToken(
-                authentication.getName()
-        );
-
-        return new LoginResponse(token);
+            throw new BadCredentialsException(
+                    "Invalid username or password"
+            );
+        }
     }
-
     @GetMapping("/verify-email")
     public String verifyEmail(
             @RequestParam String token

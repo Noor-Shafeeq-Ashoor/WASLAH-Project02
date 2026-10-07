@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -41,7 +42,17 @@ public class User {
     private UserStatus status;
 
     @Column(nullable = false)
+    private int failedLoginAttempts = 0;
+
+    @Column
+    private LocalDateTime lockedUntil;
+
+    @Column(nullable = false)
     private boolean emailVerified = false;
+
+
+
+
 
 
     @OneToOne(cascade = CascadeType.ALL)
