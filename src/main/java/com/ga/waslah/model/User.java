@@ -36,6 +36,11 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status;
+
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")
     private UserProfile userProfile;

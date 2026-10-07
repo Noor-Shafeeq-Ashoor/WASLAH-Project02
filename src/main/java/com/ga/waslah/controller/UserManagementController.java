@@ -6,6 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.ga.waslah.dto.ChangePasswordRequest;
+import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/users")
@@ -24,4 +28,22 @@ public class UserManagementController {
 
         return ResponseEntity.noContent().build();
     }
+
+
+    @PutMapping("/change-password")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request,
+            Authentication authentication
+    ) {
+
+        userService.changePassword(
+                authentication.getName(),
+                request
+        );
+
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
