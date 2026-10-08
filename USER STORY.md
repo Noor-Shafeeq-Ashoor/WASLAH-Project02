@@ -44,5 +44,12 @@ The following user stories define the main users of the WASLAH platform and the 
 | US-19 | As a user, I want sensitive endpoints to require authorization, so that only permitted users can perform certain actions.                   |
 | US-20 | As a system administrator, I want rate limiting on sensitive authentication endpoints, so that excessive requests and abuse can be reduced. |
 
+### Café Manager
+
+| ID | User Story |
+|---|---|
+| US-18 | As a café manager, I want to view bookings for my café, so that I can manage customer reservations. |
+| US-19 | As a café manager, I want to confirm a booking, so that customers know their reservation has been accepted. |
+| US-20 | As a café manager, I want to cancel or reject a booking, so that I can manage unavailable reservations. |
 ---
 
