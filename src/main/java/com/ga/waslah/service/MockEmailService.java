@@ -23,5 +23,18 @@ public class MockEmailService {
         System.out.println("========================================");
         System.out.println();
     }
+
+    public void sendPasswordResetEmail(
+            String email,
+            String resetLink
+    ) {
+
+        System.out.println("========== PASSWORD RESET EMAIL ==========");
+        System.out.println("To: " + email);
+        System.out.println("Reset your password using this link:");
+        System.out.println(resetLink);
+        System.out.println("This link will expire in 15 minutes.");
+        System.out.println("==========================================");
+    }
 }
 

@@ -1,7 +1,9 @@
 package com.ga.waslah.controller;
 
+import com.ga.waslah.dto.ForgotPasswordRequest;
 import com.ga.waslah.dto.LoginRequest;
 import com.ga.waslah.dto.LoginResponse;
+import com.ga.waslah.dto.ResetPasswordRequest;
 import com.ga.waslah.exception.BadRequestException;
 import com.ga.waslah.exception.ForbiddenException;
 import com.ga.waslah.exception.ResourceNotFoundException;
@@ -10,8 +12,11 @@ import com.ga.waslah.model.UserStatus;
 import com.ga.waslah.repository.UserRepository;
 import com.ga.waslah.security.JwtService;
 import com.ga.waslah.service.EmailVerificationService;
+import com.ga.waslah.service.PasswordResetService;
 import com.ga.waslah.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +32,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final EmailVerificationService emailVerificationService;
     private final UserService userService;
+    private final PasswordResetService passwordResetService;
 
 
     @PostMapping("/login")
@@ -121,4 +127,34 @@ public class AuthController {
 
         return "Email verified successfully. You can now login.";
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request
+    ) {
+
+        passwordResetService.createAndSendResetToken(
+                request.email()
+        );
+
+        return ResponseEntity.ok(
+                "Password reset email sent successfully"
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request
+    ) {
+
+        passwordResetService.resetPassword(
+                request.token(),
+                request.newPassword()
+        );
+
+        return ResponseEntity.ok(
+                "Password has been reset successfully"
+        );
+    }
+
 }
