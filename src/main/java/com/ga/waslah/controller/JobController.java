@@ -6,6 +6,7 @@ import com.ga.waslah.service.JobService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,20 +22,30 @@ public class JobController {
         this.jobService = jobService;
     }
 
+    // =========================
+    // CREATE
+    // =========================
+
     @PostMapping
+    @PreAuthorize("hasRole('EMPLOYER')")
     public ResponseEntity<JobResponse> createJob(
             @Valid @RequestBody JobRequest request,
             Authentication authentication
     ) {
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(
-                        jobService.createJob(
-                                authentication.getName(),
-                                request
-                        )
-                );
+        JobResponse response = jobService.createJob(
+                authentication.getName(),
+                request
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(response);
     }
+
+    // =========================
+    // GET ALL
+    // =========================
 
     @GetMapping
     public ResponseEntity<List<JobResponse>> getAllJobs() {
@@ -43,6 +54,10 @@ public class JobController {
                 jobService.getAllJobs()
         );
     }
+
+    // =========================
+    // GET BY ID
+    // =========================
 
     @GetMapping("/{id}")
     public ResponseEntity<JobResponse> getJobById(
@@ -54,7 +69,12 @@ public class JobController {
         );
     }
 
+    // =========================
+    // UPDATE
+    // =========================
+
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('EMPLOYER')")
     public ResponseEntity<JobResponse> updateJob(
             @PathVariable Long id,
             @Valid @RequestBody JobRequest request,
@@ -70,7 +90,12 @@ public class JobController {
         );
     }
 
+    // =========================
+    // CLOSE
+    // =========================
+
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('EMPLOYER')")
     public ResponseEntity<Void> deleteJob(
             @PathVariable Long id,
             Authentication authentication

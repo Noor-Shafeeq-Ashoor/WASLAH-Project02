@@ -1,11 +1,11 @@
 package com.ga.waslah.dto;
 
 import com.ga.waslah.model.EmployerRequestStatus;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
+@AllArgsConstructor
 @Getter
-@Setter
 public class EmployerRequestResponse {
 
     private String companyName;
