@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,6 +15,10 @@ import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    // =========================
+    // 404 - RESOURCE NOT FOUND
+    // =========================
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(
@@ -28,6 +33,10 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // =========================
+    // 400 - BAD REQUEST
+    // =========================
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(
             BadRequestException exception,
@@ -40,6 +49,10 @@ public class GlobalExceptionHandler {
                 request
         );
     }
+
+    // =========================
+    // 400 - VALIDATION ERROR
+    // =========================
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
@@ -63,6 +76,10 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // =========================
+    // 409 - CONFLICT
+    // =========================
+
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ErrorResponse> handleConflict(
             ConflictException exception,
@@ -75,6 +92,27 @@ public class GlobalExceptionHandler {
                 request
         );
     }
+
+    // =========================
+    // 403 - CUSTOM FORBIDDEN
+    // =========================
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbiddenException(
+            ForbiddenException exception,
+            HttpServletRequest request) {
+
+        return buildError(
+                HttpStatus.FORBIDDEN,
+                "FORBIDDEN",
+                exception.getMessage(),
+                request
+        );
+    }
+
+    // =========================
+    // 403 - SPRING SECURITY
+    // =========================
 
     @ExceptionHandler({
             AuthorizationDeniedException.class,
@@ -92,6 +130,10 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // =========================
+    // 401 - BAD CREDENTIALS
+    // =========================
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(
             BadCredentialsException exception,
@@ -105,6 +147,10 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // =========================
+    // 500 - GENERAL ERROR
+    // =========================
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(
             Exception exception,
@@ -117,6 +163,10 @@ public class GlobalExceptionHandler {
                 request
         );
     }
+
+    // =========================
+    // BUILD ERROR RESPONSE
+    // =========================
 
     private ResponseEntity<ErrorResponse> buildError(
             HttpStatus status,
@@ -134,5 +184,30 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, status);
     }
-}
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException exception,
+            HttpServletRequest request) {
+
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "BAD_REQUEST",
+                exception.getMessage(),
+                request
+        );
+    }
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponse> handleDisabledException(
+            DisabledException exception,
+            HttpServletRequest request) {
+
+        return buildError(
+                HttpStatus.FORBIDDEN,
+                "ACCOUNT_INACTIVE",
+                "Your account is inactive and cannot be used",
+                request
+        );
+    }
+
+}

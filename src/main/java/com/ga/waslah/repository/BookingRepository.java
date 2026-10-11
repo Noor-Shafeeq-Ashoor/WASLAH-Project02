@@ -20,4 +20,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             LocalDateTime endTime,
             LocalDateTime startTime
     );
+    List<Booking> findByStudySpace_Cafe_Manager_Username(String username);
 }

@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -36,6 +37,24 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status;
+
+    @Column(nullable = false)
+    private int failedLoginAttempts = 0;
+
+    @Column
+    private LocalDateTime lockedUntil;
+
+    @Column(nullable = false)
+    private boolean emailVerified = false;
+
+
+
+
+
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")
     private UserProfile userProfile;
@@ -44,5 +63,15 @@ public class User {
     @OneToMany(mappedBy = "manager")
     @ToString.Exclude
     private List<Cafe> managedCafes;
+
+    // A user can submit one or more cafe registration requests.
+    @OneToMany(
+            mappedBy = "requestedBy",
+            cascade = CascadeType.ALL
+    )
+    @ToString.Exclude
+    private List<CafeRegistrationRequest> cafeRegistrationRequests;
+
+
 
 }
