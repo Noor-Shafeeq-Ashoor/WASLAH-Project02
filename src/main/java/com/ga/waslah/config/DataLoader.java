@@ -48,6 +48,7 @@ public class DataLoader implements CommandLineRunner {
                     );
                     newManager.setRole(Role.CAFE_MANAGER);
                     newManager.setStatus(UserStatus.ACTIVE);
+                    newManager.setEmailVerified(true);
 
                     return userRepository.save(newManager);
                 });
