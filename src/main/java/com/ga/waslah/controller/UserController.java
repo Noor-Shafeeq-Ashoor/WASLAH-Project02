@@ -1,7 +1,7 @@
 package com.ga.waslah.controller;
 
-
 import com.ga.waslah.dto.RegisterRequest;
+import com.ga.waslah.dto.UserResponseDTO;
 import com.ga.waslah.model.User;
 import com.ga.waslah.service.UserService;
 import jakarta.validation.Valid;
@@ -20,13 +20,21 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(
+    public ResponseEntity<UserResponseDTO> register(
             @Valid @RequestBody RegisterRequest request
     ) {
-        User newUser = userService.register(request);
 
-        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+        User user = userService.register(request);
+
+        UserResponseDTO response = new UserResponseDTO(
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole()
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
     @GetMapping("/test")
     public String test() {
         return "JWT works!";
