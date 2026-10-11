@@ -15,6 +15,7 @@ import java.util.List;
 @RequestMapping("/api/admin/employer-requests")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
+/* comment */
 public class AdminEmployerRequestController {
 
     private final EmployerRequestService employerRequestService;
