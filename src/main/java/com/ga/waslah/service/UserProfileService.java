@@ -1,6 +1,7 @@
 package com.ga.waslah.service;
 
 import com.ga.waslah.dto.UserProfileRequest;
+import com.ga.waslah.exception.ResourceNotFoundException;
 import com.ga.waslah.model.User;
 import com.ga.waslah.model.UserProfile;
 import com.ga.waslah.repository.UserProfileRepository;
@@ -25,10 +26,11 @@ public class UserProfileService {
     public UserProfile getProfile(String username) {
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
 
         if (user.getUserProfile() == null) {
-            throw new RuntimeException("Profile not found");
+            throw new ResourceNotFoundException("Profile not found");
         }
 
         return user.getUserProfile();
@@ -40,7 +42,8 @@ public class UserProfileService {
     ) {
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
 
         UserProfile profile = user.getUserProfile();
 
@@ -59,18 +62,20 @@ public class UserProfileService {
 
         return user.getUserProfile();
     }
+
     public UserProfile updateProfileImage(
             String username,
             MultipartFile image
     ) {
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
 
         UserProfile profile = user.getUserProfile();
 
         if (profile == null) {
-            throw new RuntimeException("Profile not found");
+            throw new ResourceNotFoundException("Profile not found");
         }
 
         profile.setProfileImage(image.getOriginalFilename());
