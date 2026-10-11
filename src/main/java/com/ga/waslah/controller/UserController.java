@@ -1,8 +1,10 @@
 package com.ga.waslah.controller;
 
-
+import com.ga.waslah.dto.RegisterRequest;
+import com.ga.waslah.dto.UserResponseDTO;
 import com.ga.waslah.model.User;
 import com.ga.waslah.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +20,21 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
+    public ResponseEntity<UserResponseDTO> register(
+            @Valid @RequestBody RegisterRequest request
+    ) {
 
-        User newUser = userService.register(user);
+        User user = userService.register(request);
 
-        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+        UserResponseDTO response = new UserResponseDTO(
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole()
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
     @GetMapping("/test")
     public String test() {
         return "JWT works!";

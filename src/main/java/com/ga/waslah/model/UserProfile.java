@@ -1,7 +1,7 @@
 package com.ga.waslah.model;
 
-
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @AllArgsConstructor
@@ -14,19 +14,26 @@ import lombok.*;
 public class UserProfile {
 
     @Id
-    @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
+
+    @NotBlank(message = "First name is required")
+    @Column(nullable = false)
     private String firstName;
-    @Column
+
+    @NotBlank(message = "Last name is required")
+    @Column(nullable = false)
     private String lastName;
+
     @Column
     private String phone;
-    @Column
+
+    @Column(length = 500)
     private String bio;
+
     @Column
     private String location;
+
     @Column
     private String profileImage;
 }
