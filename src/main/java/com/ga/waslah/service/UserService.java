@@ -130,4 +130,52 @@ public class UserService {
         userRepository.save(user);
     }
 
+
+    public boolean isLoginLocked(User user) {
+
+        if (user.getLockedUntil() == null) {
+            return false;
+        }
+
+        if (user.getLockedUntil().isAfter(
+                java.time.LocalDateTime.now()
+        )) {
+            return true;
+        }
+
+        // Lock has expired.
+        user.setLockedUntil(null);
+        user.setFailedLoginAttempts(0);
+        userRepository.save(user);
+
+        return false;
+    }
+
+
+    public void recordFailedLogin(User user) {
+
+        int attempts = user.getFailedLoginAttempts() + 1;
+
+        user.setFailedLoginAttempts(attempts);
+
+        if (attempts >= 3) {
+
+            user.setLockedUntil(
+                    java.time.LocalDateTime.now().plusMinutes(1)
+            );
+        }
+
+        userRepository.save(user);
+    }
+
+
+    public void resetLoginAttempts(User user) {
+
+        user.setFailedLoginAttempts(0);
+        user.setLockedUntil(null);
+
+        userRepository.save(user);
+    }
+
+
 }
